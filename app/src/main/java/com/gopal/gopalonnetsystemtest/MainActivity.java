@@ -7,42 +7,44 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.Toast;
 
-import com.gopal.gopalonnetsystemtest.API.Api;
 import com.gopal.gopalonnetsystemtest.API.ClientApi;
 import com.gopal.gopalonnetsystemtest.Activity.AssetInfoActivity;
 import com.gopal.gopalonnetsystemtest.Adapter.CategoryInfoAdapter;
+import com.gopal.gopalonnetsystemtest.Adapter.SliderAdapter;
 import com.gopal.gopalonnetsystemtest.Model.BodyID;
 import com.gopal.gopalonnetsystemtest.Model.CategoryContent.CategoryInfo;
 import com.gopal.gopalonnetsystemtest.Model.CategoryContent.ContentInformation;
+import com.gopal.gopalonnetsystemtest.Model.CategoryContent.ImageGallery;
+import com.gopal.gopalonnetsystemtest.Model.CategoryContent.ImageGallery_;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
+import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
+import com.smarteist.autoimageslider.SliderAnimations;
+import com.smarteist.autoimageslider.SliderView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements CategoryInfoAdapter.AdapterCallback {
 
     private RecyclerView recyclerViewCategory;
     private List<ContentInformation> contentInformationList;
+    private List<ImageGallery> imageGalleryList;
     CategoryInfoAdapter adapter;
     public Toolbar mTopToolbar;
-
+    SliderView sliderView;
+    private SliderAdapter sliderAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +55,26 @@ public class MainActivity extends AppCompatActivity implements CategoryInfoAdapt
         mTopToolbar.setTitleMarginStart(10);
 
         contentInformationList = new ArrayList<>();
+        imageGalleryList = new ArrayList<>();
         recyclerViewCategory = (RecyclerView) findViewById(R.id.recyclerViewCategory);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerViewCategory.setLayoutManager(mLayoutManager);
         recyclerViewCategory.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(5), true));
         recyclerViewCategory.setItemAnimator(new DefaultItemAnimator());
+
+        sliderView = findViewById(R.id.imageSlider);
+
+
+        sliderAdapter = new SliderAdapter(MainActivity.this);
+        sliderView.setSliderAdapter(sliderAdapter);
+        sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
+        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_RIGHT);
+        sliderView.setIndicatorSelectedColor(Color.WHITE);
+        sliderView.setIndicatorUnselectedColor(Color.GRAY);
+        sliderView.setScrollTimeInSec(3);
+        sliderView.setAutoCycle(true);
+        sliderView.startAutoCycle();
 
         getCATEGORY_INFO_CALL();
     }
@@ -71,16 +88,21 @@ public class MainActivity extends AppCompatActivity implements CategoryInfoAdapt
                if (response.isSuccessful()){
                    if (response.body() !=null){
                        contentInformationList = response.body().getData().getContent().getContentInformation();
+                       if (response.body().getData().getContent().getAssetInformation() != null) {
 
-                       mTopToolbar.setTitle(response.body().getData().getContent().getCategoryName());
-                       setSupportActionBar(mTopToolbar);
+                           imageGalleryList = response.body().getData().getContent().getAssetInformation().get(0).getImageGallery();
 
+                           mTopToolbar.setTitle(response.body().getData().getContent().getCategoryName());
+                           setSupportActionBar(mTopToolbar);
+                       }
                    }
                }
 
                adapter = new CategoryInfoAdapter(MainActivity.this, contentInformationList);
                recyclerViewCategory.setAdapter(adapter);
                adapter.notifyDataSetChanged();
+
+               sliderAdapter.renewItems(imageGalleryList);
                Log.e("contentInformationList", contentInformationList.size() + "");
 
            }

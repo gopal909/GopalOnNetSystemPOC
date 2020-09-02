@@ -13,7 +13,7 @@ public class TokenInterceptor implements Interceptor {
 
         //rewrite the request to add bearer token
         Request newRequest=chain.request().newBuilder()
-                .header("Authorization","Bearer "+ "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaGFuZHJha2FudGguZGNAZ21haWwuY29tIiwicm9sZXMiOlt7ImlkIjoiNWRhMDBhMTJlMmY3NWMxYmJjNWNkOTY3Iiwicm9sZSI6IlVzZXIifV0sImlhdCI6MTU5NzkyNTI4MywiZXhwIjoxNTk4NTMwMDgzfQ.oempyZG86rRKoPqqCwqFHHNwVe5DeeFlUkfiQG83o8I")
+                .header("Authorization","Bearer "+ "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaGFuZHJha2FudGguZGNAZ21haWwuY29tIiwicm9sZXMiOlt7ImlkIjoiNWRhMDBhMTJlMmY3NWMxYmJjNWNkOTY3Iiwicm9sZSI6IlVzZXIifV0sImlhdCI6MTU5ODk0NDkwMCwiZXhwIjoxNTk5NTQ5NzAwfQ.6CaG4mEeWNU7W2vrXHp3rHWqB3wL9TS_WQzyGBavCVk")
                 .build();
 
         return chain.proceed(newRequest);

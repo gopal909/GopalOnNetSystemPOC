@@ -131,7 +131,7 @@ public class AssetInfoActivity extends AppCompatActivity {
         qualities.add(quality);
 
         mediaSource.setQualities(qualities);
-        videoView.play(mediaSource, false);
+        videoView.play(mediaSource, true);
 
     }
 
